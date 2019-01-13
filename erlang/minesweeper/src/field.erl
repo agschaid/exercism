@@ -4,6 +4,7 @@
 -export([create_field/1]).
 -export([adjacent/2, expand_bomb/1, char/1]).
 -export([init/1, handle_call/3, handle_cast/2]).
+-export([code_change/3, handle_info/2, terminate/2]).
 
 create_field(Char) ->
     {ok, Field} = gen_server:start_link(?MODULE, Char, []),
@@ -50,5 +51,8 @@ handle_call(char, _From, {N, Adjs}) ->
     Char = lists:nth(1, integer_to_list(N)),
     {reply, Char, {N, Adjs}}.
 
+code_change(_A, _B, _C) -> undefined.
+handle_info(_A, _B) -> undefined.
+terminate(_Reason, _State) -> io:format("~p~n", ["See ya"]).
 
 
