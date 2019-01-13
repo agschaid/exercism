@@ -5,9 +5,9 @@
 -define(RAINDROP_RULES, [{3, "Pling"}, {5, "Plang"}, {7, "Plong"}]).
 
 convert(Number) -> 
-    Rule_Applies = fun({I, _T}) -> Number rem I == 0 end,
+    Rule_Applies = fun({Divisor, _T}) -> Number rem Divisor == 0 end,
 
-    case lists:filter(Rule_Applies, ?RAINDROP_RULES) of
+    case [R || R <- ?RAINDROP_RULES, Rule_Applies(R)] of
         []    -> integer_to_list(Number);
-        Rules -> lists:flatmap(fun({_I, T}) -> T end, Rules)
+        Rules -> [Char || {_D, Text} <- Rules, Char <- Text]
     end.
