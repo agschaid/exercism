@@ -2,7 +2,6 @@
 
 -export([to_rna/1]).
 
-
 to_rna(Strand) -> [to_rna_nucleotide(N) || N <- Strand].
 
 to_rna_nucleotide($G) -> $C;
