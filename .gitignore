@@ -6,7 +6,6 @@ deps
 erl_crash.dump
 ebin/*.beam
 **/_build/
-**/.exercism/
 rel/example_project
 .concrete/DEV_MODE
 .rebar
