@@ -20,8 +20,8 @@ char(This) ->
     gen_server:call(This, char).
 
 
-init('*') -> {ok, {bomb, []}};
-init(' ') -> {ok, {0, []}}.
+init($*) -> {ok, {bomb, []}};
+init($ ) -> {ok, {0, []}}.
 
 handle_cast({adjacent, NewAdj}, {FieldState, Adjs}) ->
     {noreply, {FieldState, [NewAdj | Adjs]}};
@@ -42,10 +42,10 @@ handle_cast(increase_counter, {N, Adjs}) ->
     {noreply, {N+1, Adjs}}.
 
 handle_call(char, _From, {bomb, Adjs}) ->
-    {reply, '*', {bomb, Adjs}};
+    {reply, $*, {bomb, Adjs}};
 
 handle_call(char, _From, {0, Adjs}) ->
-    {reply, ' ', {0, Adjs}};
+    {reply, $\s, {0, Adjs}};
 
 handle_call(char, _From, {N, Adjs}) ->
     Char = lists:nth(1, integer_to_list(N)),
