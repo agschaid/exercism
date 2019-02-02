@@ -14,16 +14,18 @@ defmodule Bob do
   end
 
   def yelling(s) do
-    cond do
-      String.upcase(s) == s && String.downcase(s) != s -> :yelling
-      true -> :not_yelling
+    case {String.downcase(s), String.upcase(s)} do
+      # no uppercase character present.
+      {^s, _} -> :not_yelling
+      {_, ^s} -> :yelling
+       _      -> :not_yelling
     end
   end
 
   def asking(s) do
-    cond do
-      String.at(s, -1) == "?" -> :asking
-      true -> :not_asking
+    case String.at(s, -1) do
+      "?" -> :asking
+      _   -> :not_asking
     end
   end
 
