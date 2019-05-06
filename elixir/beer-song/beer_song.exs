@@ -20,25 +20,29 @@ Go to the store and buy some more, 99 bottles of beer on the wall.
 """
   end
 
-  def verse(1) do
-    """
-1 bottle of beer on the wall, 1 bottle of beer.
-Take it down and pass it around, no more bottles of beer on the wall.
-"""
-  end
-
-  def verse(2) do
-    """
-2 bottles of beer on the wall, 2 bottles of beer.
-Take one down and pass it around, 1 bottle of beer on the wall.
-"""
-  end
 
   def verse(x) do
-  """
-#{x} bottles of beer on the wall, #{x} bottles of beer.
-Take one down and pass it around, #{x-1} bottles of beer on the wall.
+    bottles_initial = bottles_text(x)
+    bottles_after = bottles_text(x-1)
+    what_to_take = if x == 1 do "it" else "one" end
+
+    """
+#{String.capitalize(bottles_initial)} of beer on the wall, #{bottles_initial} of beer.
+Take #{what_to_take} down and pass it around, #{bottles_after} of beer on the wall.
 """
+
+  end
+
+  defp bottles_text(0) do
+    "no more bottles"
+  end
+
+  defp bottles_text(1) do
+    "1 bottle"
+  end
+
+  defp bottles_text(x) do
+    "#{x} bottles"
   end
 
 
