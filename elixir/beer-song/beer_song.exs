@@ -1,14 +1,4 @@
 defmodule BeerSong do
-  @doc """
-  Get a single verse of the beer song
-  """
-  @spec verse(integer) :: String.t()
-  def verse(number) do
-    """
-#{first_line(number)}
-#{second_line(number)}
-"""
-  end
 
   @doc """
   Get the entire beer song for a given range of numbers of bottles.
@@ -20,37 +10,37 @@ defmodule BeerSong do
   end
 
   @doc """
-  Get the first line of a verse of the beer song.
+  Get a single verse of the beer song
   """
-  @spec first_line(integer) :: String.t()
-  defp first_line(verse) do
-    beer_count = amount_of_beer(verse)
-    "#{String.capitalize(beer_count)} of beer on the wall, #{beer_count} of beer."
+  @spec verse(integer) :: String.t()
+  def verse(0) do
+    """
+No more bottles of beer on the wall, no more bottles of beer.
+Go to the store and buy some more, 99 bottles of beer on the wall.
+"""
   end
 
-  @doc """
-  Get the second line of a verse of the beer song.
-  """
-  @spec second_line(integer) :: String.t()
-  def second_line(0) do
-      "Go to the store and buy some more, 99 bottles of beer on the wall."
+  def verse(1) do
+    """
+1 bottle of beer on the wall, 1 bottle of beer.
+Take it down and pass it around, no more bottles of beer on the wall.
+"""
   end
 
-  def second_line(verse) do
-      what_to_take = if verse == 1 do "it" else "one" end
-      "Take #{what_to_take} down and pass it around, #{amount_of_beer(verse-1)} of beer on the wall."
+  def verse(2) do
+    """
+2 bottles of beer on the wall, 2 bottles of beer.
+Take one down and pass it around, 1 bottle of beer on the wall.
+"""
   end
 
-  @doc """
-  Get the text representation of an amount of beer as used in the beer song.
+  def verse(x) do
   """
-  @spec amount_of_beer(integer) :: String.t()
-  defp amount_of_beer(i) do
-    case i do
-      0 -> "no more bottles"
-      1 -> "1 bottle"
-      _ -> Integer.to_string(i) <> " bottles"  
-    end
+#{x} bottles of beer on the wall, #{x} bottles of beer.
+Take one down and pass it around, #{x-1} bottles of beer on the wall.
+"""
   end
+
+
 
 end
