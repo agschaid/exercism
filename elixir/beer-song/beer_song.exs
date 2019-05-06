@@ -27,7 +27,7 @@ Go to the store and buy some more, 99 bottles of beer on the wall.
     what_to_take = if x == 1 do "it" else "one" end
 
     """
-#{String.capitalize(bottles_initial)} of beer on the wall, #{bottles_initial} of beer.
+#{bottles_initial} of beer on the wall, #{bottles_initial} of beer.
 Take #{what_to_take} down and pass it around, #{bottles_after} of beer on the wall.
 """
 
