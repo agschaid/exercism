@@ -11,13 +11,26 @@ defmodule RobotSimulator do
     defstruct [:direction, :position]
   end
 
+  @directions [:north, :east, :south, :west]
+
   @doc """
   Create a Robot Simulator given an initial direction and position.
 
   Valid directions are: `:north`, `:east`, `:south`, `:west`
   """
   @spec create(direction :: atom, position :: {integer, integer}) :: Robot.t()
-  def create(direction \\ nil, position \\ nil) do
+  def create(direction \\ :north, position \\ {0,0})
+
+  def create(direction, _) when direction not in @directions do
+    {:error, "invalid direction"}
+  end
+
+  def create(direction, position={x, y}) when is_integer(x) and is_integer(y) do
+    %Robot{direction: direction, position: position}
+  end
+
+  def create(_, _) do
+    {:error, "invalid position"}
   end
 
   @doc """
@@ -36,6 +49,7 @@ defmodule RobotSimulator do
   """
   @spec direction(robot :: Robot.t()) :: atom
   def direction(robot) do
+    robot.direction
   end
 
   @doc """
@@ -43,5 +57,6 @@ defmodule RobotSimulator do
   """
   @spec position(robot :: Robot.t()) :: {integer, integer}
   def position(robot) do
+    robot.position
   end
 end
