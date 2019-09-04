@@ -1,10 +1,22 @@
+
 defmodule RobotSimulator do
+
+  defmodule Robot do
+     @type t :: %__MODULE__{
+      direction:   atom,
+      position: {integer, integer}
+     }
+
+    @enforce_keys [:direction, :position]
+    defstruct [:direction, :position]
+  end
+
   @doc """
   Create a Robot Simulator given an initial direction and position.
 
   Valid directions are: `:north`, `:east`, `:south`, `:west`
   """
-  @spec create(direction :: atom, position :: {integer, integer}) :: any
+  @spec create(direction :: atom, position :: {integer, integer}) :: Robot.t()
   def create(direction \\ nil, position \\ nil) do
   end
 
@@ -13,7 +25,7 @@ defmodule RobotSimulator do
 
   Valid instructions are: "R" (turn right), "L", (turn left), and "A" (advance)
   """
-  @spec simulate(robot :: any, instructions :: String.t()) :: any
+  @spec simulate(robot :: Robot.t(), instructions :: String.t()) :: Robot.t()
   def simulate(robot, instructions) do
   end
 
@@ -22,14 +34,14 @@ defmodule RobotSimulator do
 
   Valid directions are: `:north`, `:east`, `:south`, `:west`
   """
-  @spec direction(robot :: any) :: atom
+  @spec direction(robot :: Robot.t()) :: atom
   def direction(robot) do
   end
 
   @doc """
   Return the robot's position.
   """
-  @spec position(robot :: any) :: {integer, integer}
+  @spec position(robot :: Robot.t()) :: {integer, integer}
   def position(robot) do
   end
 end
