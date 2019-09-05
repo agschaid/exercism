@@ -69,6 +69,24 @@ defmodule RobotSimulatorTest do
     assert RobotSimulator.position(robot3) == {11, 5}
   end
 
+  def run_test(robot, simulation, direction, position) do
+    robot_after = RobotSimulator.simulate(robot, simulation)
+    
+    assert RobotSimulator.direction(robot_after) == direction
+    assert RobotSimulator.position(robot_after) == position
+
+  end
+
+  test "single robot movements" do
+
+    base_robot = RobotSimulator.create(:north, {0, 0})
+
+    run_test(base_robot, "", :north, {0,0})
+    run_test(base_robot, "L", :west, {0,0})
+    run_test(base_robot, "R", :east, {0,0})
+
+  end
+
   test "simulate errors on invalid instructions" do
     assert RobotSimulator.create() |> RobotSimulator.simulate("UUDDLRLRBASTART") ==
              {:error, "invalid instruction"}
