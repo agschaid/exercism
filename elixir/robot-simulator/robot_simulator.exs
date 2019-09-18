@@ -69,11 +69,8 @@ defmodule RobotSimulator do
     {:error, "invalid instruction"}
   end
 
-  @doc """
-  Turn the robot according to the given rotation.
-
-  Valdi rotaions are: `:right` and `:left`
-  """
+  # Turn the robot according to the given rotation.
+  # Valid rotations are: `:right` and `:left`
   @spec turn(robot :: Robot.t(), rotation :: atom) :: Robot.t()
   defp turn(robot, rotation) when rotation in [:right, :left] do
 
