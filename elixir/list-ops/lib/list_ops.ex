@@ -12,12 +12,7 @@ defmodule ListOps do
   def reverse(l), do: reduce(l, [], &([&1|&2]))
 
   @spec map(list, (any -> any)) :: list
-  def map(l, f), do: map_tail_rec(l, [], f)
-
-  @spec map_tail_rec(list, list, (any -> any)) :: list
-  defp map_tail_rec([], rev_acc, _f), do: reverse(rev_acc) 
-  defp map_tail_rec([x|rest], rev_acc, f), do: map_tail_rec(rest, [f.(x) | rev_acc], f )
-
+  def map(l, f), do: reverse(l) |> reduce([], &([f.(&1)|&2]))
 
   @spec filter(list, (any -> as_boolean(term))) :: list
   def filter(l, f), do: filter_tail_rec(l, [], f)
