@@ -38,17 +38,15 @@ defmodule ListOps do
     else
       filter_tail_rec(rest, rev_acc, f)
     end
-
   end
 
   @type acc :: any
   @spec reduce(list, acc, (any, acc -> acc)) :: acc
-  def reduce(l, acc, f) do
-  end
+  def reduce([], acc, f), do: acc
+  def reduce([x|rest], acc, f), do: reduce(rest, f.(x, acc), f)
 
   @spec append(list, list) :: list
-  def append(a, b) do
-  end
+  def append(a, b), do: reverse(a) |> reduce(b, fn (x, l) -> [x|l] end )
 
   @spec concat([[any]]) :: [any]
   def concat(ll) do
