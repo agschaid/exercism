@@ -9,11 +9,7 @@ defmodule ListOps do
   def count(l), do: reduce(l, 0, fn (_x, acc) -> acc + 1 end)
 
   @spec reverse(list) :: list
-  def reverse(l), do: reverse_tail_rec(l, [])
-
-  @spec reverse_tail_rec(list, list) :: list
-  defp reverse_tail_rec([], acc), do: acc
-  defp reverse_tail_rec([x|rest], acc), do: reverse_tail_rec(rest, [x|acc])
+  def reverse(l), do: reduce(l, [], &([&1|&2]))
 
   @spec map(list, (any -> any)) :: list
   def map(l, f), do: map_tail_rec(l, [], f)
