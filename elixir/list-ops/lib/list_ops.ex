@@ -28,7 +28,17 @@ defmodule ListOps do
 
 
   @spec filter(list, (any -> as_boolean(term))) :: list
-  def filter(l, f) do
+  def filter(l, f), do: filter_tail_rec(l, [], f)
+
+  @spec filter_tail_rec(list, list, (any -> as_boolean(term))) :: list
+  defp filter_tail_rec([], rev_acc, _f), do: reverse(rev_acc)
+  defp filter_tail_rec([x|rest], rev_acc, f) do
+    if f.(x) do
+      filter_tail_rec(rest, [x | rev_acc], f)
+    else
+      filter_tail_rec(rest, rev_acc, f)
+    end
+
   end
 
   @type acc :: any
