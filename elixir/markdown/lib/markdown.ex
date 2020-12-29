@@ -25,6 +25,7 @@ defmodule Markdown do
     String.split(m, "\n") |> process("")
   end
 
+  @spec process([String.t()], String.t()) :: String.t()
   defp process([], acc), do: acc
   defp process([line|lines], acc) do
 
@@ -39,6 +40,7 @@ defmodule Markdown do
     end
   end
 
+  @spec process_heading(String.t(), [String.t()], String.t()) :: String.t()
   defp process_heading(current_line, lines, acc) do
     handle_heading = fn(tag, text) ->
       new_acc = acc <> enclose_with(text, tag)
@@ -57,29 +59,33 @@ defmodule Markdown do
     end
   end
 
+  @spec list_item(String.t()) :: String.t()
   defp list_item(text), do: handle_strong_and_italic(text) |> enclose_with("li")
 
+  @spec process_list_context([String.t()], String.t()) :: String.t()
   defp process_list_context(["* " <> text | rest], acc) do 
     new_acc = acc <> list_item(text)
     process_list_context(rest, new_acc)
   end
   defp process_list_context(l, acc), do: process(l, acc <> "</ul>")
 
-  @spec parse(String.t()) :: String.t()
+  @spec enclose_with(String.t(), String.t()) :: String.t()
   defp enclose_with(text, tag), do: "<#{tag}>#{text}</#{tag}>"
 
-  @spec parse(String.t()) :: String.t()
+  @spec handle_strong_and_italic(String.t()) :: String.t()
   defp handle_strong_and_italic(t) do 
     t
     |> replace_all_embracing("__", "strong")
     |> replace_all_embracing("_", "em")
   end
 
+  @spec replace_all_embracing(String.t(), String.t(), String.t()) :: String.t()
   defp replace_all_embracing(t, md_text, tag) do
     String.split(t, md_text)
     |> enclose_every_second(tag, "")
   end
 
+  @spec enclose_every_second([String.t()], String.t(), String.t()) :: String.t()
   defp enclose_every_second([last], _tag, acc), do: acc <> last
   defp enclose_every_second([t1, t2 | ts], tag , acc) do
     new_acc = acc <> t1 <> enclose_with(t2, tag)
