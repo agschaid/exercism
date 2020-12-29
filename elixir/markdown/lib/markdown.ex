@@ -19,15 +19,15 @@ defmodule Markdown do
 
   defp process(t) do
     case t do
-      "#" <> _rest -> enclose_with_header_tag(parse_header_md_level(t))
+      "# " <> text -> text |> enclose_with("h1")
+      "## " <> text -> text |> enclose_with("h2")
+      "### " <> text -> text |> enclose_with("h3")
+      "#### " <> text -> text |> enclose_with("h4")
+      "##### " <> text -> text |> enclose_with("h5")
+      "###### " <> text -> text |> enclose_with("h6")
       "*" <> _rest -> parse_list_md_level(t)
       _ -> enclose_with_paragraph_tag(String.split(t))
     end
-  end
-
-  defp parse_header_md_level(hwt) do
-    [h | t] = String.split(hwt)
-    {to_string(String.length(h)), Enum.join(t, " ")}
   end
 
   defp parse_list_md_level(l) do
@@ -35,9 +35,7 @@ defmodule Markdown do
     "<li>" <> join_words_with_tags(t) <> "</li>"
   end
 
-  defp enclose_with_header_tag({hl, htl}) do
-    "<h" <> hl <> ">" <> htl <> "</h" <> hl <> ">"
-  end
+  defp enclose_with(text, tag), do: "<#{tag}>#{text}</#{tag}>"
 
   defp enclose_with_paragraph_tag(t) do
     "<p>#{join_words_with_tags(t)}</p>"
