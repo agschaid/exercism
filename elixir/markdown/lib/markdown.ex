@@ -21,9 +21,8 @@ defmodule Markdown do
     case line do
       "#" <> _rest  -> process_heading(line, lines, acc)
       "* " <> text -> 
-        {remaining_lines, list_acc} = splice_list(lines, single_list_text(text))
-        new_acc = acc <> enclose_with(list_acc, "ul")
-        process(remaining_lines, new_acc)
+        new_acc = acc <> "<ul>" <> single_list_text(text)
+        process_list_context(lines, new_acc)
       _ -> 
         new_acc = acc <> handle_strong_and_italic(line) |> enclose_with("p")
         process(lines, new_acc)
@@ -49,17 +48,14 @@ defmodule Markdown do
 
   defp single_list_text(text), do: handle_strong_and_italic(text) |> enclose_with("li")
 
-  defp splice_list(["* " <> text | rest], acc) do 
+  defp process_list_context(["* " <> text | rest], acc) do 
     new_acc = acc <> single_list_text(text)
-    splice_list(rest, new_acc)
+    process_list_context(rest, new_acc)
   end
-  defp splice_list(l, acc), do: {l, acc}
-
-  defp start_tag(tag), do: "<#{tag}>"
-  defp end_tag(tag), do: "</#{tag}>"
+  defp process_list_context(l, acc), do: process(l, acc <> "</ul>")
 
   @spec parse(String.t()) :: String.t()
-  defp enclose_with(text, tag), do: start_tag(tag) <> text <> end_tag(tag)
+  defp enclose_with(text, tag), do: "<#{tag}>#{text}</#{tag}>"
 
   @spec parse(String.t()) :: String.t()
   defp handle_strong_and_italic(t) do 
