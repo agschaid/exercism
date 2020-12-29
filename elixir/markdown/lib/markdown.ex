@@ -18,18 +18,8 @@ defmodule Markdown do
   defp process([], acc), do: acc
   defp process([line|ls], acc) do
 
-    handle_heading = fn(tag, text) ->
-      new_acc = acc <> enclose_with(text, tag)
-      process(ls, new_acc)
-    end
-
     case line do
-      "# " <> text -> handle_heading.("h1", text)
-      "## " <> text -> handle_heading.("h2", text)
-      "### " <> text -> handle_heading.("h3", text)
-      "#### " <> text -> handle_heading.("h4", text)
-      "##### " <> text -> handle_heading.("h5", text)
-      "###### " <> text -> handle_heading.("h6", text)
+      "#" <> _rest  -> process_heading(line, ls, acc)
       "* " <> text -> 
         {list_rest, list_acc} = splice_list(ls, single_list_text(text))
         new_acc = acc <> enclose_with(list_acc, "ul")
@@ -37,6 +27,22 @@ defmodule Markdown do
       _ -> 
         new_acc = acc <> handle_strong_and_italic(line) |> enclose_with("p")
         process(ls, new_acc)
+    end
+  end
+
+  defp process_heading(current_line, lines, acc) do
+    handle_heading = fn(tag, text) ->
+      new_acc = acc <> enclose_with(text, tag)
+      process(lines, new_acc)
+    end
+
+    case current_line do
+      "# " <> text -> handle_heading.("h1", text)
+      "## " <> text -> handle_heading.("h2", text)
+      "### " <> text -> handle_heading.("h3", text)
+      "#### " <> text -> handle_heading.("h4", text)
+      "##### " <> text -> handle_heading.("h5", text)
+      "###### " <> text -> handle_heading.("h6", text)
     end
   end
 
