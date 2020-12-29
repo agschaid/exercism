@@ -18,14 +18,10 @@ defmodule Markdown do
   end
 
   defp process(t) do
-    if String.starts_with?(t, "#") || String.starts_with?(t, "*") do
-      if String.starts_with?(t, "#") do
-        enclose_with_header_tag(parse_header_md_level(t))
-      else
-        parse_list_md_level(t)
-      end
-    else
-      enclose_with_paragraph_tag(String.split(t))
+    case t do
+      "#" <> _rest -> enclose_with_header_tag(parse_header_md_level(t))
+      "*" <> _rest -> parse_list_md_level(t)
+      _ -> enclose_with_paragraph_tag(String.split(t))
     end
   end
 
