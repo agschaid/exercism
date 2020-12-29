@@ -2,6 +2,16 @@ defmodule Markdown do
   @doc """
     Parses a given string with Markdown syntax and returns the associated HTML for that string.
 
+    How I refactored:
+      * rewrote parse/1 with pipes
+      * rewrote process/1 with pattern matching
+      * made html generation much easier by introducing enclose_with/2
+      * rewrote the heading code to use pattern matching too (making it slower but simpler)
+      * unsatisfied with list code being spread out to multiple places I refactored process/1 
+        to be a tail recursive function with an accumulator. This allowed for explicit context
+        switches when lists start and end. By the way: the new code now supports multiple lists.
+      * refactored italic and bold support to a rather simple splitter alogrithm
+
     ## Examples
 
     iex> Markdown.parse("This is a paragraph")
@@ -21,7 +31,7 @@ defmodule Markdown do
     case line do
       "#" <> _rest  -> process_heading(line, lines, acc)
       "* " <> text -> 
-        new_acc = acc <> "<ul>" <> single_list_text(text)
+        new_acc = acc <> "<ul>" <> list_item(text)
         process_list_context(lines, new_acc)
       _ -> 
         new_acc = acc <> handle_strong_and_italic(line) |> enclose_with("p")
@@ -43,13 +53,14 @@ defmodule Markdown do
       "#### " <> text -> handle_heading.("h4", text)
       "##### " <> text -> handle_heading.("h5", text)
       "###### " <> text -> handle_heading.("h6", text)
+      # html only supports up to <h6>
     end
   end
 
-  defp single_list_text(text), do: handle_strong_and_italic(text) |> enclose_with("li")
+  defp list_item(text), do: handle_strong_and_italic(text) |> enclose_with("li")
 
   defp process_list_context(["* " <> text | rest], acc) do 
-    new_acc = acc <> single_list_text(text)
+    new_acc = acc <> list_item(text)
     process_list_context(rest, new_acc)
   end
   defp process_list_context(l, acc), do: process(l, acc <> "</ul>")
