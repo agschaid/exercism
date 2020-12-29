@@ -16,17 +16,17 @@ defmodule Markdown do
   end
 
   defp process([], acc), do: acc
-  defp process([line|ls], acc) do
+  defp process([line|lines], acc) do
 
     case line do
-      "#" <> _rest  -> process_heading(line, ls, acc)
+      "#" <> _rest  -> process_heading(line, lines, acc)
       "* " <> text -> 
-        {list_rest, list_acc} = splice_list(ls, single_list_text(text))
+        {remaining_lines, list_acc} = splice_list(lines, single_list_text(text))
         new_acc = acc <> enclose_with(list_acc, "ul")
-        process(list_rest, new_acc)
+        process(remaining_lines, new_acc)
       _ -> 
         new_acc = acc <> handle_strong_and_italic(line) |> enclose_with("p")
-        process(ls, new_acc)
+        process(lines, new_acc)
     end
   end
 
@@ -37,6 +37,7 @@ defmodule Markdown do
     end
 
     case current_line do
+      # this might not be the most performant way. But it's very explicit and clear
       "# " <> text -> handle_heading.("h1", text)
       "## " <> text -> handle_heading.("h2", text)
       "### " <> text -> handle_heading.("h3", text)
@@ -54,41 +55,28 @@ defmodule Markdown do
   end
   defp splice_list(l, acc), do: {l, acc}
 
+  defp start_tag(tag), do: "<#{tag}>"
+  defp end_tag(tag), do: "</#{tag}>"
+
   @spec parse(String.t()) :: String.t()
-  defp enclose_with(text, tag), do: "<#{tag}>#{text}</#{tag}>"
+  defp enclose_with(text, tag), do: start_tag(tag) <> text <> end_tag(tag)
 
   @spec parse(String.t()) :: String.t()
   defp handle_strong_and_italic(t) do 
-    String.split(t)
-    |> Enum.map(&replace_md_with_tag/1)
-    |> Enum.join(" ")
+    t
+    |> replace_all_embracing("__", "strong")
+    |> replace_all_embracing("_", "em")
   end
 
-  defp replace_md_with_tag(w) do
-    replace_suffix_md(replace_prefix_md(w))
+  defp replace_all_embracing(t, md_text, tag) do
+    String.split(t, md_text)
+    |> enclose_every_second(tag, "")
   end
 
-  defp replace_prefix_md(w) do
-    cond do
-      w =~ ~r/^#{"__"}{1}/ -> String.replace(w, ~r/^#{"__"}{1}/, "<strong>", global: false)
-      w =~ ~r/^[#{"_"}{1}][^#{"_"}+]/ -> String.replace(w, ~r/_/, "<em>", global: false)
-      true -> w
-    end
+  defp enclose_every_second([last], _tag, acc), do: acc <> last
+  defp enclose_every_second([t1, t2 | ts], tag , acc) do
+    new_acc = acc <> t1 <> enclose_with(t2, tag)
+    enclose_every_second(ts, tag, new_acc)
   end
 
-  defp replace_suffix_md(w) do
-    cond do
-      w =~ ~r/#{"__"}{1}$/ -> String.replace(w, ~r/#{"__"}{1}$/, "</strong>")
-      w =~ ~r/[^#{"_"}{1}]/ -> String.replace(w, ~r/_/, "</em>")
-      true -> w
-    end
-  end
-
-  defp patch(l) do
-    String.replace_suffix(
-      String.replace(l, "<li>", "<ul>" <> "<li>", global: false),
-      "</li>",
-      "</li>" <> "</ul>"
-    )
-  end
 end
