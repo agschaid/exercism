@@ -12,37 +12,50 @@ defmodule Markdown do
   """
   @spec parse(String.t()) :: String.t()
   def parse(m) do
-    for t <- String.split(m, "\n") do process(t) end
-    |> Enum.join()
-    |> patch()
+    String.split(m, "\n") |> process("")
   end
 
-  defp process(t) do
-    case t do
-      "# " <> text -> text |> enclose_with("h1")
-      "## " <> text -> text |> enclose_with("h2")
-      "### " <> text -> text |> enclose_with("h3")
-      "#### " <> text -> text |> enclose_with("h4")
-      "##### " <> text -> text |> enclose_with("h5")
-      "###### " <> text -> text |> enclose_with("h6")
-      "*" <> _rest -> parse_list_md_level(t)
-      _ -> enclose_with_paragraph_tag(String.split(t))
+  defp process([], acc), do: acc
+  defp process([line|ls], acc) do
+
+    handle_heading = fn(tag, text) ->
+      new_acc = acc <> enclose_with(text, tag)
+      process(ls, new_acc)
+    end
+
+    case line do
+      "# " <> text -> handle_heading.("h1", text)
+      "## " <> text -> handle_heading.("h2", text)
+      "### " <> text -> handle_heading.("h3", text)
+      "#### " <> text -> handle_heading.("h4", text)
+      "##### " <> text -> handle_heading.("h5", text)
+      "###### " <> text -> handle_heading.("h6", text)
+      "* " <> text -> 
+        {list_rest, list_acc} = splice_list(ls, single_list_text(text))
+        new_acc = acc <> enclose_with(list_acc, "ul")
+        process(list_rest, new_acc)
+      _ -> 
+        new_acc = acc <> handle_strong_and_italic(line) |> enclose_with("p")
+        process(ls, new_acc)
     end
   end
 
-  defp parse_list_md_level(l) do
-    t = String.split(String.trim_leading(l, "* "))
-    "<li>" <> join_words_with_tags(t) <> "</li>"
-  end
+  defp single_list_text(text), do: handle_strong_and_italic(text) |> enclose_with("li")
 
+  defp splice_list(["* " <> text | rest], acc) do 
+    new_acc = acc <> single_list_text(text)
+    splice_list(rest, new_acc)
+  end
+  defp splice_list(l, acc), do: {l, acc}
+
+  @spec parse(String.t()) :: String.t()
   defp enclose_with(text, tag), do: "<#{tag}>#{text}</#{tag}>"
 
-  defp enclose_with_paragraph_tag(t) do
-    "<p>#{join_words_with_tags(t)}</p>"
-  end
-
-  defp join_words_with_tags(t) do
-    Enum.join(Enum.map(t, fn w -> replace_md_with_tag(w) end), " ")
+  @spec parse(String.t()) :: String.t()
+  defp handle_strong_and_italic(t) do 
+    String.split(t)
+    |> Enum.map(&replace_md_with_tag/1)
+    |> Enum.join(" ")
   end
 
   defp replace_md_with_tag(w) do
