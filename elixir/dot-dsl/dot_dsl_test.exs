@@ -30,7 +30,7 @@ defmodule DotTest do
              )
   end
 
-   @tag :pending
+  # @tag :pending
   test "graph with one node" do
     assert %Graph{nodes: [{:a, []}]} ==
              exprt(
@@ -40,7 +40,7 @@ defmodule DotTest do
              )
   end
 
-   @tag :pending
+  # @tag :pending
   test "graph with one node with keywords" do
     assert %Graph{nodes: [{:a, [color: :green]}]} ==
              exprt(
