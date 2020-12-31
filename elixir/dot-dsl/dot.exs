@@ -14,6 +14,8 @@ defmodule Dot do
   end
 
   defp handle_line({:graph, _meta, [vals]}, graph), do: add_list(graph, :attrs, vals)
+  defp handle_line({:--, _m1, [ {a,_m2,nil}, {b,_m3,nil} ]}, graph), do: add_single(graph, :edges, {a,b,[]})
+  defp handle_line({:--, _m1, [ {a,_m2,nil}, {b,_m3,atr} ]}, graph), do: add_single(graph, :edges, {a,b,atr})
 
   defp handle_line(_line, graph) do
     graph
