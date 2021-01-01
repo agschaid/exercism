@@ -18,6 +18,8 @@ defmodule Dot do
   defp handle_line({:--, _m1, [ {a,_m2,nil}, {b,_m3,attrs} ]}, graph), do: add_single(graph, :edges, {a,b,attrs})
   defp handle_line({n, _m, nil}, graph), do: add_single(graph, :nodes, {n, []})
   defp handle_line({n, _m, [attrs]}, graph), do: add_single(graph, :nodes, {n, attrs})
+  defp handle_line(l, _g), do: 
+    raise ArgumentError, message: "'#{Macro.to_string(l)}' is not a valid dot expression"
 
   defp add_single(g, t, v), do: update(g, t, &( [v|&1] ))
   defp add_list(g, t, v), do: update(g, t, &( v ++ &1 ))
