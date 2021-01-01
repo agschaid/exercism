@@ -19,10 +19,6 @@ defmodule Dot do
   defp handle_line({n, _m, nil}, graph), do: add_single(graph, :nodes, {n, []})
   defp handle_line({n, _m, [attrs]}, graph), do: add_single(graph, :nodes, {n, attrs})
 
-  defp handle_line(_line, graph) do
-    graph
-  end
-
   defp add_single(g, t, v), do: update(g, t, &( [v|&1] ))
   defp add_list(g, t, v), do: update(g, t, &( v ++ &1 ))
 
