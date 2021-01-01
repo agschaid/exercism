@@ -5,8 +5,8 @@ end
 defmodule Dot do
   defmacro graph(ast) do
     lines = case ast[:do] do
-      {:__block__, _meta, l} -> l
-      x -> [x]
+      {:__block__, _meta, l} -> l # a multiline block. Just unpack the lines
+      x -> [x]                    # a single line block
     end
 
     sort_by_key = &(List.keysort(&1, 0))
@@ -28,8 +28,8 @@ defmodule Dot do
   defp handle_line(line={:--, _m1, [ {a,_m2,nil}, {b,_m3,attrs} ]}, graph) do 
     attrs = case attrs do
       nil  -> [] # no attributes given
+      [x|_] when is_tuple(x) -> attrs
       [a]  -> a  # attributes given as list
-      _    -> attrs
     end
     assert_keyword_list(attrs, line)
     add_single(graph, :edges, {a,b,attrs})
