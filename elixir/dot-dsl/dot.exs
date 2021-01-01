@@ -21,7 +21,7 @@ defmodule Dot do
 
   defp assert_keyword_list(l, context) do
     if ! Keyword.keyword?(l), do:
-      raise ArgumentError, message: "arguments '#{Macro.to_string(l)}' of #{context} is not a keyword list"
+      raise ArgumentError, message: "attributes '#{Macro.to_string(l)}' resulting from of #{Macro.to_string(context)} are not a keyword list"
   end
 
   defp handle_line({:graph, _meta, [vals]}, graph), do: add_list(graph, :attrs, vals)
@@ -31,12 +31,12 @@ defmodule Dot do
       [a]  -> a  # attributes given as list
       _    -> attrs
     end
-    assert_keyword_list(attrs, "edge '#{Macro.to_string(line)}'")
+    assert_keyword_list(attrs, line)
     add_single(graph, :edges, {a,b,attrs})
   end
   defp handle_line({n, _m, nil}, graph), do: add_single(graph, :nodes, {n, []})
-  defp handle_line({n, _m, [attrs]}, graph) do
-    assert_keyword_list(attrs, "node #{n}")
+  defp handle_line(line={n, _m, [attrs]}, graph) do
+    assert_keyword_list(attrs, line)
     add_single(graph, :nodes, {n, attrs})
   end
   defp handle_line(l, _g), do: 
