@@ -11,18 +11,30 @@ defmodule BankAccount do
   @opaque account :: pid
 
   @doc """
-    GenServer callback
+  GenServer callback.
   """
   def init(state), do: {:ok, state}
 
-  def handle_call(:balance, _from, state), do: {:reply, state, state}
+  # handles all calls for closed bank accounts
+  def handle_call(_anyCall, _from, {:closed, balance}) do
+    {:reply, {:error, :account_closed}, {:closed, balance} }
+  end
+  def handle_call(:balance, _from, {:open, balance}) do
+    {:reply, balance, {:open, balance}}
+  end
+  def handle_call({:update, amount}, _from, {:open, balance}) do
+    {:reply, :ok, {:open, balance + amount}}
+  end
+  def handle_call(:close, _from, {:open, balance}) do 
+    {:reply, nil, {:closed, balance}}
+  end
 
   @doc """
   Open the bank. Makes the account available.
   """
   @spec open_bank() :: account
   def open_bank() do
-    {:ok, pid} = GenServer.start_link(__MODULE__, 0)
+    {:ok, pid} = GenServer.start_link(__MODULE__, {:open, 0})
     pid
   end
 
@@ -31,6 +43,7 @@ defmodule BankAccount do
   """
   @spec close_bank(account) :: none
   def close_bank(account) do
+    GenServer.call(account, :close)
   end
 
   @doc """
@@ -46,5 +59,6 @@ defmodule BankAccount do
   """
   @spec update(account, integer) :: any
   def update(account, amount) do
+    GenServer.call(account, {:update, amount})
   end
 end
