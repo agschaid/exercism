@@ -3,16 +3,27 @@ defmodule BankAccount do
   A bank account that supports access from multiple processes.
   """
 
+  use GenServer
+
   @typedoc """
   An account handle.
   """
   @opaque account :: pid
 
   @doc """
+    GenServer callback
+  """
+  def init(state), do: {:ok, state}
+
+  def handle_call(:balance, _from, state), do: {:reply, state, state}
+
+  @doc """
   Open the bank. Makes the account available.
   """
   @spec open_bank() :: account
   def open_bank() do
+    {:ok, pid} = GenServer.start_link(__MODULE__, 0)
+    pid
   end
 
   @doc """
@@ -27,6 +38,7 @@ defmodule BankAccount do
   """
   @spec balance(account) :: integer
   def balance(account) do
+    GenServer.call(account, :balance)
   end
 
   @doc """
