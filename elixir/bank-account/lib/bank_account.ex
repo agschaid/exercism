@@ -16,7 +16,7 @@ defmodule BankAccount do
   def init(state), do: {:ok, state}
 
   # handles all calls for closed bank accounts
-  def handle_call(_anyCall, _from, {:closed, balance}) do
+  def handle_call(_any_call, _from, {:closed, balance}) do
     {:reply, {:error, :account_closed}, {:closed, balance} }
   end
   def handle_call(:balance, _from, {:open, balance}) do
