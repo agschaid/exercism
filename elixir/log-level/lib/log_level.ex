@@ -4,20 +4,28 @@ defmodule LogLevel do
 
   @new_codes Map.merge( @legacy_codes, %{0 => :trace, 5 => :fatal} )
 
-  def to_label(level, true) do
-    Map.get(@legacy_codes, level, :unknown)
-  end
-  def to_label(level, false) do
-    Map.get(@new_codes, level, :unknown)
+  def to_label(level, legacy?) do
+
+    # OK. The creators of this exercise want me to learn about cond. And I respect
+    # that. But those long lists of low-level clauses smell. So this is all you
+    # get. Sorry. I mean well ;)
+    supported_codes = cond do
+      legacy? -> @legacy_codes
+      true -> @new_codes
+    end
+
+    Map.get(supported_codes, level, :unknown)
   end
 
   def alert_recipient(level, legacy?) do
-    case {to_label(level, legacy?), legacy?} do
-      {:error, _} -> :ops
-      {:fatal, _} -> :ops
-      {:unknown, true} -> :dev1
-      {:unknown, false} -> :dev2
-      _ -> false
+
+    label = to_label(level, legacy?)
+
+    cond do
+      label in [:error, :fatal] -> :ops
+      label == :unknown -> if legacy? do :dev1 else :dev2 end
+      true -> false
     end
+
   end
 end
