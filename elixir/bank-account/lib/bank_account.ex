@@ -8,17 +8,16 @@ defmodule BankAccount do
   """
   @opaque account :: pid
 
-
-  def manage_account({:closed, balance}, _any_command) do 
+  defp manage_account({:closed, balance}, _any_command) do 
     {{:error, :account_closed}, {:closed, balance}}
   end
-  def manage_account({:open, balance}, :close) do
-    {nil, {:closed, balance}}
+  defp manage_account({:open, balance}, :close) do
+    {:ok, {:closed, balance}}
   end
-  def manage_account({:open, balance}, :balance) do
+  defp manage_account({:open, balance}, :balance) do
     {balance, {:open, balance}}
   end
-  def manage_account({:open, balance}, {:update, amount}) do
+  defp manage_account({:open, balance}, {:update, amount}) do
     {:ok, {:open, balance + amount }}
   end
 
@@ -36,7 +35,7 @@ defmodule BankAccount do
   """
   @spec close_bank(account) :: none
   def close_bank(account) do
-    Agent.get_and_update(account, __MODULE__, :manage_account, [:close])
+    Agent.get_and_update(account, fn s -> manage_account(s, :close) end)
   end
 
   @doc """
@@ -44,7 +43,7 @@ defmodule BankAccount do
   """
   @spec balance(account) :: integer
   def balance(account) do
-    Agent.get_and_update(account, __MODULE__, :manage_account, [:balance])
+    Agent.get_and_update(account, fn s -> manage_account(s, :balance) end)
   end
 
   @doc """
@@ -52,6 +51,6 @@ defmodule BankAccount do
   """
   @spec update(account, integer) :: any
   def update(account, amount) do
-    Agent.get_and_update(account, __MODULE__, :manage_account, [{:update, amount}])
+    Agent.get_and_update(account, fn s -> manage_account(s, {:update, amount}) end)
   end
 end
