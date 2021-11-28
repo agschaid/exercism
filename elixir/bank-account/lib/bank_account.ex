@@ -14,9 +14,12 @@ defmodule BankAccount do
   end
   defp manage_account({:open, balance}, command) do
     case command do
-      :close   -> {nil, {:closed, balance}}
-      :balance -> {balance, {:open, balance}}
-      {:update, amount} -> {:ok, {:open, balance + amount}}
+      :close   ->
+        {nil, {:closed, balance}}
+      :balance ->
+        {balance, {:open, balance}}
+      {:update, amount} ->
+        {:ok, {:open, balance + amount}}
     end
   end
 
@@ -33,22 +36,28 @@ defmodule BankAccount do
   Close the bank. Makes the account unavailable.
 
   Be aware that this does NOT terminate the underlying process. This helps to
-  differentiate non-existing/deleted accounts from closed ones.
+  differentiate non-existing/deleted accounts from closed ones. Also this
+  reserves the PID so it can't even theoretically be reused for another bank
+  account.
   """
   @spec close_bank(account) :: none
   def close_bank(account) do
     Agent.get_and_update(account, fn s -> manage_account(s, :close) end)
   end
 
-  @doc """
-  Deletes the bank.
-
-  Be aware that this frees the PID of the bank to be (theoretically) reused in
-  the future. Client code is responsible for sweeping all references to this account.
-  """
-  def delete_bank(account) do
-    Agent.stop(account)
-  end
+  #######
+  # This is what actual acount deletion looks like. But exercism complains about
+  # untested functions
+  #######
+  # @doc false"""
+  # Deletes the bank.
+  # 
+  # Be aware that this frees the PID of the bank to be (theoretically) reused in
+  # the future. Client code is responsible for sweeping all references to this account.
+  # """
+  # def delete_bank(account) do
+  #   Agent.stop(account)
+  # end
 
   @doc """
   Get the account's balance.
