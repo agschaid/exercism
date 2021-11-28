@@ -39,25 +39,39 @@ defmodule BankAccount do
   differentiate non-existing/deleted accounts from closed ones. Also this
   reserves the PID so it can't even theoretically be reused for another bank
   account.
+
+  ## Examples
+    iex> account = BankAccount.open_bank()
+    iex> Process.alive?(account)
+    true
+    iex> BankAccount.close_bank(account)
+    iex> Process.alive?(account)
+    true
+    iex> BankAccount.balance(account)
+    {:error, :account_closed}
   """
   @spec close_bank(account) :: none
   def close_bank(account) do
     Agent.get_and_update(account, fn s -> manage_account(s, :close) end)
   end
 
-  #######
-  # This is what actual acount deletion looks like. But exercism complains about
-  # untested functions
-  #######
-  # @doc false"""
-  # Deletes the bank.
-  # 
-  # Be aware that this frees the PID of the bank to be (theoretically) reused in
-  # the future. Client code is responsible for sweeping all references to this account.
-  # """
-  # def delete_bank(account) do
-  #   Agent.stop(account)
-  # end
+  @doc """
+  Deletes the bank.
+  
+  Be aware that this frees the PID of the bank to be (theoretically) reused in
+  the future. Client code is responsible for sweeping all references to this account.
+
+  ## Examples
+    iex> account = BankAccount.open_bank()
+    iex> Process.alive?(account)
+    true
+    iex> BankAccount.delete_bank(account)
+    iex> Process.alive?(account)
+    false
+  """
+  def delete_bank(account) do
+    Agent.stop(account)
+  end
 
   @doc """
   Get the account's balance.

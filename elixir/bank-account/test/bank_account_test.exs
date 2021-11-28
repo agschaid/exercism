@@ -1,5 +1,6 @@
 defmodule BankAccountTest do
   use ExUnit.Case
+  doctest BankAccount
 
   setup do
     account = BankAccount.open_bank()
