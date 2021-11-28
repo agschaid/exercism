@@ -3,30 +3,23 @@ defmodule BankAccount do
   A bank account that supports access from multiple processes.
   """
 
-  use GenServer
-
   @typedoc """
   An account handle.
   """
   @opaque account :: pid
 
-  @doc """
-  GenServer callback.
-  """
-  def init(state), do: {:ok, state}
 
-  # handles all calls for closed bank accounts
-  def handle_call(_any_call, _from, {:closed, balance}) do
-    {:reply, {:error, :account_closed}, {:closed, balance} }
+  def manage_account({:closed, balance}, _any_command) do 
+    {{:error, :account_closed}, {:closed, balance}}
   end
-  def handle_call(:balance, _from, {:open, balance}) do
-    {:reply, balance, {:open, balance}}
+  def manage_account({:open, balance}, :close) do
+    {nil, {:closed, balance}}
   end
-  def handle_call({:update, amount}, _from, {:open, balance}) do
-    {:reply, :ok, {:open, balance + amount}}
+  def manage_account({:open, balance}, :balance) do
+    {balance, {:open, balance}}
   end
-  def handle_call(:close, _from, {:open, balance}) do 
-    {:reply, nil, {:closed, balance}}
+  def manage_account({:open, balance}, {:update, amount}) do
+    {:ok, {:open, balance + amount }}
   end
 
   @doc """
@@ -34,7 +27,7 @@ defmodule BankAccount do
   """
   @spec open_bank() :: account
   def open_bank() do
-    {:ok, pid} = GenServer.start_link(__MODULE__, {:open, 0})
+    {:ok, pid} = Agent.start(fn -> {:open, 0} end)
     pid
   end
 
@@ -43,7 +36,7 @@ defmodule BankAccount do
   """
   @spec close_bank(account) :: none
   def close_bank(account) do
-    GenServer.call(account, :close)
+    Agent.get_and_update(account, __MODULE__, :manage_account, [:close])
   end
 
   @doc """
@@ -51,7 +44,7 @@ defmodule BankAccount do
   """
   @spec balance(account) :: integer
   def balance(account) do
-    GenServer.call(account, :balance)
+    Agent.get_and_update(account, __MODULE__, :manage_account, [:balance])
   end
 
   @doc """
@@ -59,6 +52,6 @@ defmodule BankAccount do
   """
   @spec update(account, integer) :: any
   def update(account, amount) do
-    GenServer.call(account, {:update, amount})
+    Agent.get_and_update(account, __MODULE__, :manage_account, [{:update, amount}])
   end
 end
