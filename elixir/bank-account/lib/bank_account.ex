@@ -12,14 +12,12 @@ defmodule BankAccount do
   defp manage_account({:closed, balance}, _any_command) do 
     {{:error, :account_closed}, {:closed, balance}}
   end
-  defp manage_account({:open, balance}, :close) do
-    {:ok, {:closed, balance}}
-  end
-  defp manage_account({:open, balance}, :balance) do
-    {balance, {:open, balance}}
-  end
-  defp manage_account({:open, balance}, {:update, amount}) do
-    {:ok, {:open, balance + amount }}
+  defp manage_account({:open, balance}, command) do
+    case command do
+      :close   -> {nil, {:closed, balance}}
+      :balance -> {balance, {:open, balance}}
+      {:update, amount} -> {:ok, {:open, balance + amount}}
+    end
   end
 
   @doc """
