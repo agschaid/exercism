@@ -1,25 +1,38 @@
 defmodule LanguageList do
+  @moduledoc """
+  not sure about the scope of the assignment I opted to go for "no helper functions"
+  """
+
   def new() do
-    # Please implement the new/0 function
+    []
   end
 
   def add(list, language) do
-    # Please implement the add/2 function
+    [language | list]
   end
 
-  def remove(list) do
-    # Please implement the remove/1 function
+  def remove([_x|xs]) do
+    xs
   end
 
-  def first(list) do
-    # Please implement the first/1 function
+  def first([x|_xs]) do
+    x
   end
 
-  def count(list) do
-    # Please implement the count/1 function
+  def count([]) do
+    0
+  end
+  def count([_x|xs]) do
+    1 + count(xs)
   end
 
-  def exciting_list?(list) do
-    # Please implement the exciting_list?/1 function
+  def exciting_list?([]) do
+    false
+  end
+  def exciting_list?(["Elixir" | _xs]) do
+    true
+  end
+  def exciting_list?([_x | xs]) do
+    exciting_list?(xs)
   end
 end
